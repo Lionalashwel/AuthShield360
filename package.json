@@ -1,0 +1,24 @@
+{
+  "name": "authshield360",
+  "version": "1.0.0",
+  "description": "AuthShield 360 - Adaptive Identity Defense Platform (TechWiz 7 SRS Adaptive Risk-Based Authentication + SOC Monitoring Dashboard)",
+  "type": "module",
+  "main": "backend/index.js",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "start": "node backend/index.js",
+    "dev": "node --watch backend/index.js",
+    "db:reset": "node scripts/reset-db.js",
+    "test": "node scripts/smoke.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemailer": "^10.0.10"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.12.0",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0"
+  }
+}

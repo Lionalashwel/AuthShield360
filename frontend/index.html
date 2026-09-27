@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cornell Deep · Identity Protection Platform</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="css/styles.css" />
+<script>
+  /* apply saved theme before first paint (no flash) */
+  (function () {
+    try { document.documentElement.dataset.theme = localStorage.getItem('cornell-theme') || 'light'; }
+    catch (e) { document.documentElement.dataset.theme = 'light'; }
+  })();
+</script>
+</head>
+<body>
+<!-- ══════════════ Ingest view (login / register) ══════════════ -->
+<section id="view-ingest" class="view">
+  <div class="login-shell">
+    <header class="brand school">
+      <div class="logo"><img src="assets/logo.svg" alt="Cornell Deep" /></div>
+      <div>
+        <h1>Cornell&nbsp;Deep</h1>
+        <p class="tagline">Identity Protection Platform · v2</p>
+      </div>
+      <div class="theme-switch" role="group" aria-label="Theme">
+        <button type="button" class="theme-btn" data-theme-set="light"><i class="theme-swatch light"></i>Light</button>
+        <button type="button" class="theme-btn" data-theme-set="ocean"><i class="theme-swatch ocean"></i>Ocean</button>
+      </div>
+    </header>
+
+    <div class="login-card">
+      <div class="tabs">
+        <button class="tab on" data-tab="login">Sign in</button>
+        <button class="tab" data-tab="register">Create account</button>
+      </div>
+
+      <!-- Sign-in form -->
+      <form id="login-form">
+        <label class="fld"><span>User name or e-mail</span><input id="li-user" autocomplete="username" placeholder="admin / student1 / you@campus.edu" required /></label>
+
+        <div class="hidden" id="li-stepup">
+          <label class="fld"><span>Mobile OTP (6 digits)</span><input id="li-otp" inputmode="numeric" maxlength="6" placeholder="834 921" /></label>
+          <label class="fld" id="li-emailfld"><span>Email verification code (watch mailbox)</span><input id="li-email" inputmode="numeric" maxlength="6" placeholder="6-digit code" /></label>
+        </div>
+
+        <label class="fld"><span>Password</span><input id="li-pass" type="password" autocomplete="current-password" required /></label>
+
+        <div class="scn">
+          <label><span>Scenario</span>
+            <select id="li-scenario">
+              <option value="1">S1 · Password only (baseline)</option>
+              <option value="2">S2 · Password + OTP MFA</option>
+              <option value="3">S3 · Password + OTP + E-mail + RBAC</option>
+            </select>
+          </label>
+          <label class="chk" title="This computer stays trusted for 1 year"><input type="checkbox" id="li-trust" checked /> Trust this device after verify</label>
+        </div>
+
+        <button class="btn" type="submit" id="li-btn">Authenticate</button>
+        <div id="li-msg" class="msg"></div>
+      </form>
+
+      <!-- Registration form -->
+      <form id="reg-form" class="hidden">
+        <p class="hint">Registration uses <b>real e-mail verification</b> (Nodemailer / Ethereal https). The verify link stamps this browser as a <b>Trusted Device</b> via an encrypted cookie.</p>
+        <label class="fld"><span>Full name</span><input id="rg-name" placeholder="Noura AlSaif" required /></label>
+        <label class="fld"><span>E-mail</span><input id="rg-email" type="email" placeholder="you@campus.edu" required /></label>
+        <label class="fld"><span>National ID</span><input id="rg-nid" placeholder="1-123456789-0 / SCH-…" required /></label>
+        <label class="fld"><span>Password (min 8)</span><input id="rg-pass" type="password" minlength="8" required /></label>
+        <button class="btn" type="submit">Register</button>
+        <div id="rg-msg" class="msg"></div>
+      </form>
+
+      <!-- Pending approval (new device waits for trusted device) -->
+      <div class="hidden" id="pending-box">
+        <div class="pulse-ring"><div class="spinner"></div></div>
+        <h3 id="pb-title">Waiting for approval…</h3>
+        <p class="pb-sub">A push request is on your trusted device. Open it in incognito or a second window, log in, and hit <b>Approve</b> when the dialog appears.</p>
+        <div class="pb-row"><span>Fallback to E-mail + OTP in</span><b id="pb-countdown">20 s</b></div>
+        <button class="btn" id="pb-cancel">Cancel request</button>
+    </div>
+    <p class="school-note">Cornell Deep School · academic project · data is fictional &amp; local only</p>
+  </div>
+</section>
+
+<!-- ══════════════ Application shell (post-login) ══════════════ -->
+<section id="view-app" class="view hidden">
+  <div class="app-shell">
+    <header class="app-top">
+      <div class="brand">
+        <img class="logo" src="assets/logo.svg" alt="Cornell Deep" />
+        <div><b>Cornell Deep</b><small id="w-role">……</small></div>
+      </div>
+      <nav class="w-tabs" id="w-tabs"></nav>
+      <div class="app-user">
+        <div class="theme-switch" role="group" aria-label="Theme">
+          <button type="button" class="theme-btn" data-theme-set="light"><i class="theme-swatch light"></i>Light</button>
+          <button type="button" class="theme-btn" data-theme-set="ocean"><i class="theme-swatch ocean"></i>Ocean</button>
+        </div>
+        <span id="w-user">……</span>
+        <button class="link" id="w-logout">Log out</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <!-- ════════ School portal ════════ -->
+      <section id="view-portal" class="sub-view hidden">
+        <div class="panel">
+          <div class="hdr"><h2>School portal</h2><span class="sub" id="p-sub">fictional modules · dummy data</span></div>
+          <div class="p-modules" id="p-modnav"></div>
+          <div id="p-overview" class="kv"></div>
+          <div id="portal-content"></div>
+        </div>
+      </section>
+
+      <!-- ════════ Security center (user) ════════ -->
+      <section id="view-user" class="sub-view hidden">
+        <div class="user-shell">
+          <div class="topbar">
+            <div class="crumb"><span>My Security Center</span><span id="u-role" class="chip">…</span></div>
+            <div class="gauge-row">
+              <div class="gauge"><b id="u-dev">0</b><span>TRUSTED DEVICES</span></div>
+              <div class="gauge"><b id="u-sess">0</b><span>ACTIVE SESSIONS</span></div>
+              <div class="gauge"><b id="u-act">0</b><span>ACTIVITY</span></div>
+            </div>
+          </div>
+          <div class="kv">
+            <div class="kv-card"><span>E-mail verified</span><b id="u-verified">—</b></div>
+            <div class="kv-card"><span>Last login risk posture</span><b id="u-posture">—</b></div>
+            <div class="kv-card"><span>National ID</span><b id="u-nid">—</b></div>
+          </div>
+          <div class="hdr rules-title"><h3>My trusted devices</h3></div>
+          <div class="table-wrap"><table class="tbl" id="u-devices">
+            <thead><tr><th>Device</th><th>Browser</th><th>Fingerprint</th><th>Last seen</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <div class="hdr rules-title"><h3>My sessions</h3></div>
+          <div class="table-wrap"><table class="tbl" id="u-sessions">
+            <thead><tr><th>IP</th><th>Network</th><th>MFA</th><th>Started</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <div class="hdr rules-title"><h3>Recent activity</h3></div>
+          <div class="table-wrap"><table class="tbl" id="u-activity">
+            <thead><tr><th>Time</th><th>Outcome</th><th>Risk</th><th>Reasons</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+
+          <div class="hdr rules-title"><h3>Account recovery · MFA reset</h3><span class="sub">self-service via registered identity</span></div>
+          <div class="row-actions">
+            <input id="rc-identifier" placeholder="username or e-mail" class="mini-in" />
+            <button class="btn sm" id="rc-request-btn">Request recovery code</button>
+          </div>
+          <div class="msg" id="rc-status"></div>
+          <div class="hidden" id="rc-step2">
+            <div class="row-actions">
+              <input id="rc-verify" placeholder="verification code" class="mini-in" />
+              <input id="rc-newpass" type="password" placeholder="new password (min 8)" class="mini-in" />
+              <button class="btn sm" id="rc-reset-btn">Reset password + MFA</button>
+            </div>
+            <div class="msg" id="rc-result"></div>
+          </div>
+          <div class="row-actions" style="margin-top:12px">
+            <input id="rc-validate-id" placeholder="username to validate" class="mini-in" />
+            <input id="rc-validate-code" placeholder="recovery code" class="mini-in" />
+            <button class="btn sm" id="rc-validate-btn">Validate recovery code</button>
+          </div>
+          <div class="msg" id="rc-validate-out"></div>
+          <footer><button class="btn out" id="btn-user-logout">Log out</button></footer>
+        </div>
+      </section>
+
+      <!-- ════════ SOC console ════════ -->
+      <section id="view-soc" class="sub-view hidden">
+        <aside class="side">
+          <div class="side-head">
+            <img class="logo" src="assets/logo.svg" alt="Cornell Deep" />
+            <div><b>Cornell Deep</b><small>Security Center</small></div>
+          </div>
+          <nav>
+            <button class="nav on" data-panel="overview">Overview</button>
+            <button class="nav" data-panel="audit">Audit Log</button>
+            <button class="nav" data-panel="sessions">Sessions</button>
+            <button class="nav" data-panel="devices">Trusted Devices</button>
+            <button class="nav" data-panel="factors">Threat Factors</button>
+            <button class="nav" data-panel="blacklist">Blacklist</button>
+            <button class="nav" data-panel="sim">Attack Simulation</button>
+          </nav>
+          <footer class="side-foot">
+            <div class="kpi-line"><span class="dot"></span> <span id="arm-badge">——</span></div>
+            <button class="link" id="btn-logout">Exit session</button>
+          </footer>
+        </aside>
+
+        <main class="main">
+          <div class="topbar">
+            <div class="crumb"><span>Defense Orchestrator</span><span id="role-chip" class="chip">ADMIN</span></div>
+            <div class="gauge-row">
+              <div class="gauge"><b id="g-succ">0</b><span>SUCCESS</span></div>
+              <div class="gauge"><b id="g-fail">0</b><span>FAILED</span></div>
+              <div class="gauge"><b id="g-otp">0</b><span>INVALID OTP</span></div>
+              <div class="gauge"><b id="g-block">0</b><span>BLOCKED IPS</span></div>
+              <div class="gauge"><b id="g-step">0</b><span>STEP-UP</span></div>
+              <div class="gauge"><b id="g-alert">0</b><span>ALERTS</span></div>
+              <div class="gauge"><b id="g-live">0</b><span>SSE LIVE</span></div>
+            </div>
+          </div>
+
+          <!-- Overview -->
+          <section class="panel" id="panel-overview">
+            <div class="hdr"><h2>Threat overview</h2><span class="sub" id="ov-ts"></span></div>
+            <div class="kv">
+              <div class="kv-card"><span>Lockout policy</span><b>2 consecutive failures → immediate block</b></div>
+              <div class="kv-card"><span>Risk engine</span><b id="ov-risk-bands">LOW ≤30 · MED 31–69 · HIGH ≥70</b></div>
+              <div class="kv-card"><span>Cross-device approval</span><b id="ov-cda">WebSocket/SSE push · 45&nbsp;s TTL · OTP fallback</b></div>
+              <div class="kv-card"><span>Threat feed</span><b id="ov-feed">0 events</b></div>
+            </div>
+            <div class="hdr rules-title"><h3>Realtime security feed</h3><span class="live-pill" id="feed-live">LIVE</span></div>
+            <div class="table-wrap"><table class="tbl" id="feed">
+              <thead><tr><th>Time</th><th>Outcome</th><th>User</th><th>Role</th><th>Risk</th><th>IP · Network</th><th>Reasons / MFA</th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+
+            <div class="hdr rules-title"><h3>Attack simulation timeline</h3><span class="sub" id="sim-live">idle</span></div>
+            <div class="timeline" id="timeline"><div class="empty">Run an attack from the <b>Attack Simulation</b> tab.</div></div>
+          </section>
+
+          <!-- Audit log -->
+          <section class="panel hidden" id="panel-audit">
+            <div class="hdr"><h2>Audit log</h2>
+              <div class="row-actions">
+                <select id="af-outcome" class="mini-in"><option value="">outcome: all</option><option>SUCCESS</option><option>FAILED_PASSWORD</option><option>INVALID_OTP</option><option>EXPIRED_OTP</option><option>HIGH_RISK_BLOCK</option><option>STEP_UP</option><option>RECOVERY_REQUEST</option><option>RECOVERY_RESET</option></select>
+                <select id="af-role" class="mini-in"><option value="">role: all</option><option>STUDENT</option><option>TEACHER</option><option>ADMINISTRATOR</option></select>
+                <input id="af-user" placeholder="user filter" class="mini-in" />
+                <button class="btn sm" id="af-apply">Filter</button>
+                <button class="link" id="btn-clear-factors">Clear threat factors</button>
+              </div>
+            </div>
+            <div class="table-wrap"><table class="tbl" id="audit">
+              <thead><tr><th>Time</th><th>Outcome</th><th>Actor</th><th>Risk</th><th>Detail</th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+          </section>
+
+          <!-- Sessions -->
+          <section class="panel hidden" id="panel-sessions">
+            <div class="hdr"><h2>Active sessions</h2><span class="sub">terminate any session remotely</span></div>
+            <div class="table-wrap"><table class="tbl" id="sess">
+              <thead><tr><th>User</th><th>IP</th><th>Network</th><th>MFA</th><th>Started</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+          </section>
+
+          <!-- Trusted devices -->
+          <section class="panel hidden" id="panel-devices">
+            <div class="hdr"><h2>Trusted devices</h2><span class="sub">encrypted trust cookie · 1-year validity</span></div>
+            <div class="table-wrap"><table class="tbl" id="devices">
+              <thead><tr><th>User</th><th>Device</th><th>Browser</th><th>Fingerprint</th><th>Last seen</th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+          </section>
+
+          <!-- Threat factors -->
+          <section class="panel hidden" id="panel-factors">
+            <div class="hdr"><h2>Threat factors</h2><span class="sub">contextual signals that feed the 0–100 score</span></div>
+            <div class="kv">
+              <div class="kv-card"><span>F_TIME_ANOMALY</span><b>+15</b><small>Login outside 7:00–23:00</small></div>
+              <div class="kv-card"><span>F_NEW_IP</span><b>+25</b><small>Subnet never seen for user</small></div>
+              <div class="kv-card"><span>F_IMPOSSIBLE_TRAVEL</span><b>+40</b><small>&gt;1,000 km in &lt;60 s</small></div>
+              <div class="kv-card"><span>F_NEW_DEVICE</span><b>+30</b><small>Unknown browser fingerprint</small></div>
+              <div class="kv-card"><span>F_CONSECUTIVE_FAILURE</span><b>+20</b><small>per running failed streak</small></div>
+              <div class="kv-card"><span>F_UNRECOGNIZED_DEVICE</span><b>+30</b><small>not on trusted-device registry</small></div>
+              <div class="kv-card"><span>F_BLACKLISTED_IP</span><b>+45</b><small>source is blacklisted</small></div>
+            </div>
+            <div class="hdr rules-title"><h3>Recorded factors</h3></div>
+            <div class="table-wrap"><table class="tbl" id="factors">
+              <thead><tr><th>Time</th><th>Risk</th><th>Level</th><th>Factors</th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+            <div class="hdr rules-title"><h3>Defense actions</h3></div>
+            <div class="row-actions">
+              <button class="btn sm" id="btn-arm">ARM (clear + standby off)</button>
+              <button class="btn sm out" id="btn-standby">STANDBY</button>
+              <input id="release-user" placeholder="username to unlock" class="mini-in" />
+              <button class="btn sm" id="btn-release">Force unlock</button>
+            </div>
+          </section>
+
+          <!-- Blacklist -->
+          <section class="panel hidden" id="panel-blacklist">
+            <div class="hdr"><h2>Blacklist</h2><span class="sub">+45 risk for any login attempt from these IPs</span></div>
+            <div class="row-actions">
+              <input id="bl-ip" placeholder="ip to block (e.g. 198.51.100.7)" class="mini-in" />
+              <button class="btn sm" id="btn-bl-add">Blacklist</button>
+            </div>
+            <div class="table-wrap"><table class="tbl" id="blacklist">
+              <thead><tr><th>IP</th><th>Reason</th><th>Added</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+          </section>
+
+          <!-- Attack simulation -->
+          <section class="panel hidden" id="panel-sim">
+            <div class="hdr"><h2>Attack simulation</h2><span class="sub">runs against the REAL auth risk pipeline</span></div>
+            <div class="sim-run">
+              <select id="sim-type">
+                <option value="A">Type A · Brute-Force Spray</option>
+                <option value="B">Type B · Impossible-Travel blitz</option>
+                <option value="C">Type C · Credential-Stuffing replay</option>
+              </select>
+              <button class="btn" id="btn-sim">Launch attack</button>
+            </div>
+            <div class="hdr rules-title"><h3>Live attack telemetry</h3></div>
+            <div class="timeline" id="timeline-2"><div class="empty">Run an attack to watch the SOC respond in real time.</div></div>
+            <div class="hdr rules-title"><h3>Past runs</h3></div>
+            <div class="table-wrap"><table class="tbl" id="sims">
+              <thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Events</th></tr></thead>
+              <tbody></tbody>
+            </table></div>
+          </section>
+        </main>
+      </section>
+
+      <!-- ════════ Forensics ════════ -->
+      <section id="view-forensics" class="sub-view hidden">
+        <div class="panel">
+          <div class="hdr"><h2>Digital Forensic Investigations</h2><span class="sub">timeline reconstruction from the persisted database</span></div>
+          <div class="kv" id="fx-summary"></div>
+
+          <div class="hdr rules-title"><h3>Reconstruct timeline</h3><span class="sub">correlated chain across audit · sessions · alerts · approvals · simulations</span></div>
+          <div class="row-actions">
+            <input id="fx-user" placeholder="username" class="mini-in" />
+            <input id="fx-ip" placeholder="IP address" class="mini-in" />
+            <input id="fx-device" placeholder="device fingerprint" class="mini-in" />
+            <select id="fx-outcome" class="mini-in"><option value="">outcome: all</option><option>SUCCESS</option><option>FAILED_PASSWORD</option><option>INVALID_OTP</option><option>EXPIRED_OTP</option><option>HIGH_RISK_BLOCK</option><option>STEP_UP</option><option>SESSION</option><option>PENDING</option></select>
+            <button class="btn sm" id="fx-search">Search</button>
+            <button class="btn sm out" id="fx-clear">Clear</button>
+          </div>
+          <div class="timeline" id="fx-timeline"><div class="empty">Search any user, IP or device to reconstruct the event chain.</div></div>
+
+          <div class="hdr rules-title"><h3>Open a case</h3><span class="sub">wrap a scope into an investigation · auto-captures matching evidence</span></div>
+          <div class="row-actions">
+            <input id="fx-c-title" placeholder="case title (e.g. Impossible-travel incident)" class="mini-in" />
+            <select id="fx-c-sev" class="mini-in"><option>INFO</option><option>MEDIUM</option><option selected>CRITICAL</option></select>
+            <input id="fx-c-user" placeholder="scope: username" class="mini-in" />
+            <input id="fx-c-ip" placeholder="scope: IP" class="mini-in" />
+            <input id="fx-c-device" placeholder="scope: device" class="mini-in" />
+            <button class="btn sm" id="fx-c-create">Create case</button>
+          </div>
+
+          <div class="hdr rules-title"><h3>Cases</h3></div>
+          <div class="table-wrap"><table class="tbl" id="fx-cases">
+            <thead><tr><th>Ref</th><th>Title</th><th>Severity</th><th>Status</th><th>Events</th><th>Created</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ════════ Case drawer ════════ -->
+      <div id="fx-drawer" class="hidden">
+        <div class="fx-drawer-card">
+          <div class="hdr"><h2 id="fxd-title">Case</h2><button class="link" id="fxd-close">✕</button></div>
+          <div id="fxd-meta" class="kv"></div>
+          <div class="hdr rules-title"><h3>Evidence timeline</h3><span class="sub" id="fxd-count"></span></div>
+          <div class="timeline" id="fxd-timeline"></div>
+          <div class="row-actions">
+            <input id="fxd-note" placeholder="add investigation note" class="mini-in" />
+            <button class="btn sm" id="fxd-add">Add note</button>
+            <button class="btn sm" id="fxd-export">Export evidence (.md)</button>
+            <button class="btn sm" id="fxd-closecase">Close case</button>
+            <button class="btn sm out" id="fxd-del">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ Benchmark ════════ -->
+      <section id="view-bench" class="sub-view hidden">
+        <div class="panel">
+          <div class="hdr"><h2>Authentication Mode Comparison</h2><span class="sub">SRS 1.2 — measured from the real audit trail</span></div>
+          <div class="table-wrap"><table class="tbl" id="bm-table">
+            <thead><tr><th>Mode</th><th>Attempts</th><th>Avg login time</th><th>Success</th><th>Failed password</th><th>2nd-factor failures</th><th>Blocked</th><th>Step-ups</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <div class="msg" id="bm-note"></div>
+          <div class="hdr rules-title"><h3>Security / Usability profile (SRS Table 1)</h3></div>
+          <div class="table-wrap"><table class="tbl" id="bm-class">
+            <thead><tr><th>Mode</th><th>Security strength</th><th>Usability</th><th>Risk reduced when…</th></tr></thead>
+            <tbody>
+              <tr><td>Password-only</td><td>Low–Medium</td><td>Very easy</td><td>adds no protection if the password is stolen</td></tr>
+              <tr><td>Password + OTP</td><td>Medium–High</td><td>Easy–moderate</td><td>a stolen password alone is insufficient</td></tr>
+              <tr><td>Password + OTP + E-mail step-up</td><td>Higher</td><td>Moderate (depends on e-mail access)</td><td>an additional barrier if the registered e-mail stays uncompromised</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ Cross-device approval modal (trusted device) ══════════════ -->
+<div id="approve-modal" class="modal hidden">
+  <div class="modal-card shake-in">
+    <div class="modal-ico"><img src="assets/logo.svg" alt="Cornell Deep" style="width:46px;height:46px" /></div>
+    <h3>Approve new-device sign-in?</h3>
+    <p id="ap-sub" class="pb-sub">Someone is trying to sign in from an unrecognized device.</p>
+    <div class="ap-device"><b id="ap-dev">Unknown device</b><span id="ap-loc">IP …</span></div>
+    <div class="ap-risk"><span>Contextual risk</span><b id="ap-risk">…/100</b></div>
+    <div class="ap-reasons" id="ap-reasons"></div>
+    <div class="modal-actions">
+      <button class="btn out" id="ap-deny">Deny</button>
+      <button class="btn" id="ap-approve">Approve</button>
+    </div>
+    <small id="ap-note">Decision will stream back to the requesting device instantly.</small>
+  </div>
+</div>
+
+<!-- ══════════════ Toasts ══════════════ -->
+<div id="toasts" class="toasts"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

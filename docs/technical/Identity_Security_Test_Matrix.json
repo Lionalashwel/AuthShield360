@@ -1,0 +1,506 @@
+{
+  "schema": "as360-test-matrix/v2",
+  "project": "AuthShield 360 v2 - Real-Time Enterprise Edition",
+  "generated": "2026-09-26T15:50:00.000Z",
+  "automation": {
+    "harness1": "node scripts/smoke.js",
+    "harness2": "node scripts/e2e-all.js",
+    "harness3": "node scripts/ui-smoke.js",
+    "harness4": "node scripts/restart-check.js (isolated :4001)",
+    "assertions": {
+      "smoke": 17,
+      "e2e": 77,
+      "uiSmoke": 28,
+      "restartCheck": 18,
+      "total": 140
+    },
+    "requiresServer": {
+      "smoke": false,
+      "e2e": true,
+      "uiSmoke": true,
+      "restartCheck": false
+    }
+  },
+  "riskEngine": [
+    {
+      "id": "RSK-01",
+      "factor": "F_TIME_ANOMALY",
+      "delta": 15,
+      "detail": "outside 07:00-23:00 local"
+    },
+    {
+      "id": "RSK-02",
+      "factor": "F_NEW_IP",
+      "delta": 25,
+      "detail": "subnet unseen for user"
+    },
+    {
+      "id": "RSK-03",
+      "factor": "F_NEW_DEVICE",
+      "delta": 30,
+      "band": "LOW",
+      "detail": "unknown fingerprint alone = 30"
+    },
+    {
+      "id": "RSK-04",
+      "factor": "F_UNRECOGNIZED_DEVICE",
+      "delta": 30
+    },
+    {
+      "id": "RSK-05",
+      "factor": "F_CONSECUTIVE_FAILURE",
+      "delta": 20,
+      "perFailure": true
+    },
+    {
+      "id": "RSK-06",
+      "factor": "F_IMPOSSIBLE_TRAVEL",
+      "delta": 40,
+      "detail": ">1000 km/min via GEO_TABLE haversine"
+    },
+    {
+      "id": "RSK-07",
+      "factor": "F_BLACKLISTED_IP",
+      "delta": 45
+    },
+    {
+      "id": "RSK-08",
+      "factor": "CLAMP_0_100",
+      "delta": 0
+    },
+    {
+      "id": "RSK-09",
+      "factor": "BAND_LOW",
+      "range": "0..30",
+      "action": "Direct login (S1) or S2|S3 step-up"
+    },
+    {
+      "id": "RSK-10",
+      "factor": "BAND_MEDIUM",
+      "range": "31..69",
+      "action": "Cross-Device Approval push or E-mail+OTP fallback"
+    },
+    {
+      "id": "RSK-11",
+      "factor": "BAND_HIGH",
+      "range": "70..100",
+      "action": "Immediate lockdown + admin alert"
+    },
+    {
+      "id": "RSK-12",
+      "factor": "REASONS_ARRAY",
+      "output": "score,level,reasons[]",
+      "detail": "mandated API shape replaces factors"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "SCN-1A",
+      "scenario": 1,
+      "input": "correct password (trusted+known net)",
+      "expected": "SUCCESS"
+    },
+    {
+      "id": "SCN-1B",
+      "scenario": 1,
+      "input": "wrong password",
+      "expected": "FAILED_PASSWORD"
+    },
+    {
+      "id": "SCN-1C",
+      "scenario": 1,
+      "input": "2x wrong -> lock, 3rd",
+      "expected": "HIGH_RISK_BLOCK"
+    },
+    {
+      "id": "SCN-2A",
+      "scenario": 2,
+      "input": "password ok, no otp",
+      "expected": "STEP_UP(otp)"
+    },
+    {
+      "id": "SCN-2B",
+      "scenario": 2,
+      "input": "valid OTP",
+      "expected": "SUCCESS"
+    },
+    {
+      "id": "SCN-2C",
+      "scenario": 2,
+      "input": "wrong OTP",
+      "expected": "INVALID_OTP (no lock)"
+    },
+    {
+      "id": "SCN-3A",
+      "scenario": 3,
+      "input": "password ok, no codes",
+      "expected": "STEP_UP(otp+email)"
+    },
+    {
+      "id": "SCN-3B",
+      "scenario": 3,
+      "input": "valid OTP + email code",
+      "expected": "SUCCESS"
+    },
+    {
+      "id": "SCN-3C",
+      "scenario": 3,
+      "input": "role-denied route (STUDENT)",
+      "expected": "HIGH_RISK_BLOCK"
+    }
+  ],
+  "verification": [
+    {
+      "id": "VER-01",
+      "step": "POST /api/auth/register",
+      "expected": "verification_pending + verifyUrl (+Ethereal preview when online)"
+    },
+    {
+      "id": "VER-02",
+      "step": "token single-use TTL",
+      "expected": "verification_tokens row"
+    },
+    {
+      "id": "VER-03",
+      "step": "GET /api/verify?token=",
+      "expected": "email_verified=1 + Set-Cookie as360_trust (1y,HttpOnly)"
+    },
+    {
+      "id": "VER-04",
+      "step": "GET /api/me with cookie",
+      "expected": "trusted:true"
+    },
+    {
+      "id": "VER-06",
+      "step": "OTP-verified new device",
+      "expected": "auto trusted-device row"
+    }
+  ],
+  "crossDeviceApproval": [
+    {
+      "id": "XDA-01",
+      "step": "untrusted MEDIUM login",
+      "expected": "PENDING_APPROVAL + pendingId + fallbackAt"
+    },
+    {
+      "id": "XDA-02",
+      "step": "trusted-device SSE",
+      "expected": "cross:<uid> event (device,ip,location,risk,reasons)"
+    },
+    {
+      "id": "XDA-03",
+      "step": "approve + finalize",
+      "expected": "SUCCESS + session"
+    },
+    {
+      "id": "XDA-04",
+      "step": "deny + finalize",
+      "expected": "denied / not_approved"
+    },
+    {
+      "id": "XDA-05",
+      "step": "timeout",
+      "expected": "expired -> E-mail+OTP fallback"
+    }
+  ],
+  "simulator": [
+    {
+      "id": "SIM-a",
+      "type": "A",
+      "name": "Brute Force",
+      "telemetry": "risk 55 -> 75 -> 100",
+      "endstate": "lockdown + alerts"
+    },
+    {
+      "id": "SIM-b",
+      "type": "B",
+      "name": "Impossible Travel",
+      "telemetry": "SF->SYD ~12,000km",
+      "endstate": "HIGH lockdown"
+    },
+    {
+      "id": "SIM-c",
+      "type": "C",
+      "name": "Credential Stuffing",
+      "telemetry": "blacklisted IP +45",
+      "endstate": "blocked regardless of password"
+    }
+  ],
+  "auditTrailFields": [
+    "ts",
+    "outcome",
+    "username",
+    "role",
+    "user_id",
+    "ip",
+    "subnet",
+    "network",
+    "device_name",
+    "browser",
+    "user_agent",
+    "fingerprint",
+    "risk",
+    "factors(reasons)",
+    "sid",
+    "detail"
+  ],
+  "auditOutcomes": [
+    "SUCCESS",
+    "FAILED_PASSWORD",
+    "INVALID_OTP",
+    "EXPIRED_OTP",
+    "STEP_UP",
+    "PENDING_APPROVAL",
+    "DENIED",
+    "HIGH_RISK_BLOCK"
+  ],
+  "securityControls": [
+    {
+      "id": "SEC-01",
+      "title": "session issued on success",
+      "api": "POST /api/auth/login"
+    },
+    {
+      "id": "SEC-02",
+      "title": "session revoke",
+      "api": "POST /api/session/demote"
+    },
+    {
+      "id": "SEC-03",
+      "title": "blacklist +45 blocks login",
+      "api": "POST /api/blacklist"
+    },
+    {
+      "id": "SEC-04",
+      "title": "whitelist remove",
+      "api": "DELETE /api/whitelist"
+    },
+    {
+      "id": "SEC-05",
+      "title": "factor expiry window",
+      "api": "GET /api/factors"
+    },
+    {
+      "id": "SEC-06",
+      "title": "lockout release (pw-only lock)",
+      "api": "DELETE /api/factors/lockout"
+    },
+    {
+      "id": "SEC-07",
+      "title": "device revoke",
+      "api": "POST /api/my/device/revoke"
+    },
+    {
+      "id": "SEC-08",
+      "title": "trusted cookie status",
+      "api": "GET /api/me"
+    }
+  ],
+  "roles": {
+    "ADMINISTRATOR": "SOC console (Overview/Audit/Sessions/Devices/Factors/Blacklist/Sim) + School portal (all modules + matrix) + Forensics + Benchmark",
+    "TEACHER": "School portal (own courses, rosters) + Security Center",
+    "STUDENT": "Security Center: verified status, my devices/sessions/activity + School portal (own-only, no admin modules)"
+  },
+  "seedAccounts": [
+    {
+      "username": "student1",
+      "role": "STUDENT",
+      "password": "Student@123",
+      "nationalId": "SCH-2019001345"
+    },
+    {
+      "username": "student2",
+      "role": "STUDENT",
+      "password": "Student@123",
+      "nationalId": "SCH-2021002287"
+    },
+    {
+      "username": "teacher1",
+      "role": "TEACHER",
+      "password": "Teacher@123",
+      "nationalId": "NID-1023399801"
+    },
+    {
+      "username": "teacher2",
+      "role": "TEACHER",
+      "password": "Teacher@123",
+      "nationalId": "NID-1087721123"
+    },
+    {
+      "username": "admin",
+      "role": "ADMINISTRATOR",
+      "password": "Admin@123",
+      "nationalId": "NID-1177STAFF044"
+    }
+  ],
+  "portalRbac": [
+    {
+      "id": "RBA-01",
+      "check": "GET /api/portal/session without session",
+      "expect": "401 SESSION_REQUIRED"
+    },
+    {
+      "id": "RBA-02",
+      "check": "STUDENT grades/courses/attendance",
+      "expect": "200 own data"
+    },
+    {
+      "id": "RBA-03",
+      "check": "STUDENT rosters/users/matrix",
+      "expect": "403 PORTAL_RBAC_DENIED"
+    },
+    {
+      "id": "RBA-04",
+      "check": "TEACHER rosters",
+      "expect": "200 own courses"
+    },
+    {
+      "id": "RBA-05",
+      "check": "TEACHER matrix/users",
+      "expect": "403"
+    },
+    {
+      "id": "RBA-06",
+      "check": "ADMIN matrix",
+      "expect": "200, 8 modules"
+    },
+    {
+      "id": "RBA-07",
+      "check": "ADMIN users/rosters",
+      "expect": "200 all rows"
+    },
+    {
+      "id": "RBA-09",
+      "check": "Scenario-3 STUDENT route lock",
+      "expect": "HIGH_RISK_BLOCK UNAUTHORIZED_ROUTE"
+    },
+    {
+      "id": "RBA-10",
+      "check": "admin control plane gate",
+      "expect": "403 ADMIN_SESSION_REQUIRED"
+    }
+  ],
+  "recovery": [
+    {
+      "id": "REC-01",
+      "check": "POST /api/recovery/request",
+      "expect": "ok + 6-digit code"
+    },
+    {
+      "id": "REC-02",
+      "check": "reset wrong code/weak pw",
+      "expect": "rejected"
+    },
+    {
+      "id": "REC-03",
+      "check": "POST /api/recovery/reset",
+      "expect": "TOTP rotated + 10 single-use codes"
+    },
+    {
+      "id": "REC-04",
+      "check": "validate code once",
+      "expect": "1st ok, 2nd false"
+    },
+    {
+      "id": "REC-05",
+      "check": "login new password",
+      "expect": "SUCCESS"
+    },
+    {
+      "id": "REC-06",
+      "check": "login old password",
+      "expect": "FAILED_PASSWORD"
+    },
+    {
+      "id": "REC-07",
+      "check": "audit outcomes",
+      "expect": "RECOVERY_REQUEST/RESET/CODE_VALID"
+    }
+  ],
+  "forensics": [
+    {
+      "id": "FOR-01",
+      "check": "GET /api/forensics/summary",
+      "expect": "live counters"
+    },
+    {
+      "id": "FOR-02",
+      "check": "timeline?user=",
+      "expect": "chronological events"
+    },
+    {
+      "id": "FOR-03",
+      "check": "create case auto-capture",
+      "expect": "case + evidence"
+    },
+    {
+      "id": "FOR-04",
+      "check": "list cases items counter",
+      "expect": "items>0"
+    },
+    {
+      "id": "FOR-06",
+      "check": "close",
+      "expect": "CLOSED"
+    },
+    {
+      "id": "FOR-07",
+      "check": "markdown export",
+      "expect": "# Forensic Case"
+    },
+    {
+      "id": "FOR-08",
+      "check": "delete",
+      "expect": "removed"
+    }
+  ],
+  "benchmark": [
+    {
+      "id": "BEN-01",
+      "check": "GET /api/benchmark",
+      "expect": "ok + 3 scenarios"
+    },
+    {
+      "id": "BEN-02",
+      "check": "per scenario stats",
+      "expect": "attempts/averageLoginTimeMs/success"
+    },
+    {
+      "id": "BEN-03",
+      "check": "measured from real elapsed_ms",
+      "expect": "no fixtures"
+    }
+  ],
+  "nfr": [
+    {
+      "id": "NFR-01",
+      "check": "hard restart same DB",
+      "expect": "users+devices survive"
+    },
+    {
+      "id": "NFR-02",
+      "check": "audit trail survives",
+      "expect": "count>=pre"
+    },
+    {
+      "id": "NFR-03",
+      "check": "sessions/devices survive",
+      "expect": "counters persist"
+    },
+    {
+      "id": "NFR-04",
+      "check": "TOTP secrets survive",
+      "expect": "login still works"
+    },
+    {
+      "id": "NFR-05",
+      "check": "cases+evidence survive",
+      "expect": "export ok"
+    },
+    {
+      "id": "NFR-06",
+      "check": "attack runs survive",
+      "expect": "history intact"
+    }
+  ]
+}

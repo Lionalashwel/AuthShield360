@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cornell Deep · منصة حماية الهوية — عرض تقديمي</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<script>
+  (function(){ try{ document.documentElement.dataset.theme = localStorage.getItem('cornell-theme') || 'light'; }catch(e){ document.documentElement.dataset.theme='light'; } })();
+</script>
+<style>
+  :root{
+    --bg:#eef3f9; --card:#ffffff; --line:#dbe5ef; --ink:#152a3c; --mut:#4c6377; --faint:#8296a8;
+    --acc:#0f766e; --acc2:#1d4ed8; --warn:#a55a06; --crit:#c0304a; --ok:#0d7a45;
+    --slide-bg:radial-gradient(1200px 700px at 80% 6%, #dcecf8 0%, #eef3f9 62%);
+    --pill-bg:rgba(15,118,110,.10); --pill-line:rgba(15,118,110,.30);
+    --code-bg:#f1f6fa; --shadow:0 18px 44px rgba(16,40,66,.14); --num-glow:none;
+  }
+  :root[data-theme="ocean"]{
+    --bg:#e6f3f1; --card:#ffffff; --line:#cfe3e2; --ink:#0f2e33; --mut:#3d6469; --faint:#6d8d90;
+    --acc:#0f766e; --acc2:#1d4ed8; --warn:#a55a06; --crit:#c0304a; --ok:#0d7a45;
+    --slide-bg:radial-gradient(1200px 700px at 80% 6%, #c6e8f6 0%, #e6f3f1 62%);
+    --pill-bg:rgba(15,118,110,.12); --pill-line:rgba(15,118,110,.34);
+    --code-bg:#eef7f6; --shadow:0 18px 44px rgba(9,45,55,.18); --num-glow:0 0 34px rgba(15,118,110,.22);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Segoe UI',Tahoma,Arial,sans-serif;overflow:hidden;transition:background-color .25s,color .25s}
+  .deck{width:100vw;height:100vh;position:relative}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:7vh 8vw;
+         background:var(--slide-bg);box-shadow:inset 0 0 0 1px var(--line)}
+  .slide.on{display:flex}
+  .brand{position:absolute;z-index:20;top:20px;right:34px;display:flex;gap:10px;align-items:center;font-size:14px;letter-spacing:.4px;color:var(--acc);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 16px 6px 8px;box-shadow:var(--shadow);font-weight:600}
+  .brand img{width:26px;height:26px;display:block}
+  .tsw{position:absolute;z-index:20;top:20px;left:34px;display:flex;gap:4px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow)}
+  .tb{padding:6px 13px;border:none;border-radius:999px;background:transparent;color:var(--mut);font-size:12.5px;font-weight:700;cursor:pointer}
+  .tb.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+  .pageno{position:absolute;z-index:20;bottom:22px;left:34px;font-size:13px;color:var(--mut)}
+  .kicker{color:var(--acc2);font-size:15px;letter-spacing:2px;margin-bottom:10px}
+  h1{font-size:46px;margin:0 0 12px;line-height:1.25}
+  h2{font-size:30px;margin:0 0 20px}
+  .lead{font-size:20px;color:var(--mut);max-width:900px;line-height:1.8}
+  .grid{display:grid;gap:16px;margin-top:34px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+  .card b{color:var(--acc);display:block;font-size:18px;margin-bottom:8px}
+  .card p, .card li{color:var(--mut);font-size:15px;line-height:1.7;margin:0}
+  .card ul{margin:0;padding-right:18px}
+  .big{font-size:52px;font-weight:800;color:var(--acc);font-family:'Segoe UI'}
+  .pill{display:inline-block;background:var(--pill-bg);color:var(--acc);border:1px solid var(--pill-line);border-radius:999px;padding:4px 12px;font-size:13px;margin-left:6px;font-weight:600}
+  .num{font-size:72px;font-weight:800;color:var(--acc);text-shadow:var(--num-glow)}
+  table{width:100%;border-collapse:collapse;margin-top:22px;font-size:15px}
+  th,td{border-bottom:1px solid var(--line);padding:10px 14px;text-align:right}
+  th{color:var(--acc2);font-weight:600}
+  code{background:var(--code-bg);border:1px solid var(--line);padding:2px 8px;border-radius:6px;direction:ltr;display:inline-block;font-family:Consolas,monospace;font-size:14px;color:var(--ink)}
+  .footer{position:absolute;z-index:20;bottom:22px;right:34px;font-size:13px;color:var(--mut)}
+  h1{color:var(--ink)}
+  .hint{position:absolute;z-index:20;bottom:22px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--faint)}
+  .bar{height:14px;border-radius:8px;overflow:hidden;display:flex;margin-top:26px;border:1px solid var(--line)}
+  .bar i{display:block;height:100%}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div class="brand"><img src="assets/logo.svg" alt="Cornell Deep"><span>Cornell Deep · Identity Protection Platform</span></div>
+  <div class="tsw" role="group" aria-label="Theme"><button class="tb" data-t="light">Light</button><button class="tb" data-t="ocean">Ocean</button></div>
+  <div class="pageno" id="pageno"></div>
+  <div class="footer">مدرسة Cornell Deep · مشروع أمن المعلومات</div>
+  <div class="hint">استخدم الأسهم ← → أو النقر للتنقل</div>
+
+  <!-- 1 -->
+  <section class="slide on">
+    <div class="kicker">SRS PHASE 2 · IDENTITY PROTECTION</div>
+    <h1>منصة حماية الهوية الذكية<br>مدرسة Cornell&nbsp;Deep</h1>
+    <p class="lead">نظام تسجيل دخول ذكي يحمي حسابات الموظفين والطلاب من الاختراق، يولّد «درجة خطر» لكل محاولة دخول ويتصرف فورًا: دخول مباشر، أو خطوة تحقق إضافية، أو إغلاق فوري + إنذار لفريق الأمان.</p>
+    <div style="margin-top:26px">
+      <span class="pill">تسجيل + توثيق بريد حقيقي</span>
+      <span class="pill">جهاز موثوق</span>
+      <span class="pill">سيناريوهات S1-S2-S3</span>
+      <span class="pill">غرفة عمليات SOC</span>
+      <span class="pill">هجمات محاكاة A-B-C</span>
+      <span class="pill">بث مباشر SSE</span>
+      <span class="pill">بوابة مدرسية RBAC</span>
+      <span class="pill">تحقيق رقمي</span>
+      <span class="pill">استرداد الحساب</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide">
+    <div class="kicker">المشكلة</div>
+    <h1>لا يكفي «كلمة مرور فقط»</h1>
+    <p class="lead">كلمة المرور تُسرَق أو تُخمَّن. المشكلة الحقيقية: كيف نميّز الدخول الشرعي من الدخول المشبوه قبل حدوث الضرر؟</p>
+    <div class="grid g3">
+      <div class="card"><b>سرقة كلمة المرور</b><p>محاولات القوة الغاشمة تختبر ملايين الكلمات في ثوانٍ.</p></div>
+      <div class="card"><b>جهاز مجهول</b><p>الدخول من جهاز لا تستخدمه عادة هو أول إنذار.</p></div>
+      <div class="card"><b>سفر مستحيل</b><p>دخول من الرياض وبعد 12 ثانية من سان فرانسيسكو = حساب مخترق.</p></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide">
+    <div class="kicker">الحل المقترح</div>
+    <h1>درجة خطر لحظية لكل محاولة</h1>
+    <p class="lead">النظام يجمع قرائن السياق ويحسب درجة من 0 إلى 100، ثم يتصرف وفق سياسة واضحة:</p>
+    <div class="bar">
+      <i style="width:30%;background:var(--acc)"></i>
+      <i style="width:39%;background:var(--warn)"></i>
+      <i style="width:31%;background:var(--crit)"></i>
+    </div>
+    <div class="grid g3" style="margin-top:18px">
+      <div class="card"><b style="color:var(--ok)">0 – 30 منخفضة</b><p>دخول مباشر بكلمة المرور فقط.</p></div>
+      <div class="card"><b style="color:var(--warn)">31 – 69 متوسطة</b><p>خطوة إضافية: رمز OTP وتوثيق البريد.</p></div>
+      <div class="card"><b style="color:var(--crit)">70 – 100 عالية</b><p>إغلاق فوري للمحاولة + إشعار فريق الأمان.</p></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide">
+    <div class="kicker">أوزان العوامل</div>
+    <h1>كيف تُحسب الدرجة؟</h1>
+    <table>
+      <tr><th>العامل</th><th>الزيادة</th><th>مثال</th></tr>
+      <tr><td>وقت شاذ (منتصف الليل)</td><td>+15</td><td>دخول 02:00 ليلًا</td></tr>
+      <tr><td>شبكة جديدة</td><td>+25</td><td>عنوان إنترنت مختلف عن المعتاد</td></tr>
+      <tr><td>جهاز غير معروف</td><td>+30</td><td>حاسوب لم يُستخدم من قبل</td></tr>
+      <tr><td>سفر مستحيل</td><td>+40</td><td>مدينتان متباعدتان خلال دقائق</td></tr>
+      <tr><td>عنوان محظور</td><td>+45</td><td>IP في القائمة السوداء</td></tr>
+      <tr><td>محاولة فاشلة</td><td>+20 للمرة</td><td>تجميع كلمات مرور خاطئة</td></tr>
+    </table>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <div class="kicker">دورة التسجيل</div>
+    <h1>من «بريد يصل» إلى «جهاز موثوق»</h1>
+    <div class="grid g4">
+      <div class="card"><b>١</b><p>إنشاء الحساب ببيانات حقيقية.</p></div>
+      <div class="card"><b>٢</b><p>بريد تحقق حقيقي عبر صندوق Ethereal التجريبي.</p></div>
+      <div class="card"><b>٣</b><p>النقر على الرابط يجعل هذا المتصفح «جهازًا موثوقًا».</p></div>
+      <div class="card"><b>٤</b><p>الدخول التالي منه مباشر وسلس.</p></div>
+    </div>
+    <p class="lead" style="margin-top:26px;font-size:16px">وفي حال غياب الإنترنت: يطبع النظام الرسالة في الطرفية ويبقى كل شيء قابلًا للتجربة.</p>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <div class="kicker">سيناريوهات الدخول</div>
+    <h1>ثلاثة مستويات صارمة</h1>
+    <div class="grid g3">
+      <div class="card"><b>S1</b><p>كلمة المرور فقط — للجهاز والشبكة المعروفين ودرجة منخفضة.</p></div>
+      <div class="card"><b>S2</b><p>كلمة المرور + رمز OTP (توثيق ثنائي) — عند درجة متوسطة.</p></div>
+      <div class="card"><b>S3</b><p>كلمة المرور + OTP + رمز البريد + صلاحية RBAC — للفريق الإداري فقط.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide">
+    <div class="kicker">الدفاع الحي</div>
+    <h1>موافقة عبر جهاز آخر</h1>
+    <p class="lead">حساب يسجّل دخولًا من جهاز غريب بدرجة متوسطة؟ النظام لا يمنعه فورًا بل ينتظر <b>موافقتك من جهازك الموثوق</b> — تمامًا مثل نافذة «هل هذا أنت؟» في البنوك الحديثة.</p>
+    <div class="grid g3">
+      <div class="card"><b>الجهاز الجديد</b><p>دخول بمتوسطة ← معلّق (PENDING).</p></div>
+      <div class="card"><b>الجهاز الموثوق</b><p>يستقبل دفعًا فوريًا ويعرض: وافق / ارفض.</p></div>
+      <div class="card"><b>النتيجة</b><p>الموافقة تختم الجهاز وتسمح بالدخول؛ الرفض يمنعه.</p></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide">
+    <div class="kicker">غرفة عمليات الأمان</div>
+    <h1>لوحة SOC — كل شيء لحظي</h1>
+    <div class="grid g4">
+      <div class="card"><b>عدادات حية</b><p>نجاح/فشل/OTP/حظر من قاعدة البيانات مباشرة.</p></div>
+      <div class="card"><b>توزيع الدرجات</b><p>منخفضة/متوسطة/عالية لكل المحاولات.</p></div>
+      <div class="card"><b>أحداث لحظية</b><p>بث مباشر SSE بلا تحديث للصفحة.</p></div>
+      <div class="card"><b>إنذارات</b><p>حظر، قوة غاشمة، ومهاجمون يُعلَّمون فورًا.</p></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide">
+    <div class="kicker">الهجمات المحاكية</div>
+    <h1>اختبر الدفاع بنفسك: A · B · C</h1>
+    <div class="grid g3">
+      <div class="card"><b>A — القوة الغاشمة</b><p>55 → 75 → 100 بثلاث محاولات خاطئة، ثم إغلاق الحساب وإنذار.</p></div>
+      <div class="card"><b>B — السفر المستحيل</b><p>الرياض ثم سان فرانسيسكو خلال 12 ثانية ← +40 ← إغلاق فوري.</p></div>
+      <div class="card"><b>C — العنوان المحظور</b><p>دخول من IP في القائمة السوداء ← +45 ← حظر حتى بكلمة مرور صحيحة.</p></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide">
+    <div class="kicker">الفرق عن الحلول السابقة</div>
+    <h1>هذه ليست مظاهر شكلية — هذا حقيقي</h1>
+    <div class="grid g4">
+      <div class="card"><b>بيانات حقيقية</b><p>تسجيل فعلي، بريد فعلي، جلسات في قاعدة بيانات.</p></div>
+      <div class="card"><b>توثيق حي</b><p>TOTP RFC 6238 (OTP) بأكواد تنتهي كل 30 ثانية.</p></div>
+      <div class="card"><b>أمان مضمّن</b><p>قفل، قوائم سوداء/بيضاء، سياسة RBAC.</p></div>
+      <div class="card"><b>قابل للفحص</b><p>سجل تدقيق كامل + أرقام تُحسب من قاعدة البيانات.</p></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide">
+    <div class="kicker">النتائج</div>
+    <h1>اختبار شامل — كل المراحل خضراء</h1>
+    <div class="grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card" style="text-align:center"><div class="num">140</div><b>فحصًا آليًا خضراء</b></div>
+      <div class="card" style="text-align:center"><div class="num">77</div><b>E2E حي (بوابة/استرداد/تحقيق/أداء)</b></div>
+      <div class="card" style="text-align:center"><div class="num">28</div><b>فحوص UI بمتصفح حقيقي</b></div>
+      <div class="card" style="text-align:center"><div class="num">18</div><b>بقاء البيانات بعد إعادة التشغيل</b></div>
+    </div>
+    <p class="lead" style="margin-top:30px;font-size:17px">فيديو توثيقي جاهز (<code>demo.mp4</code>) يعرض كل الميزات أثناء اشتغالها، ودليل غير تقني بالعربية في <code>docs/</code>.</p>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide">
+    <div class="kicker">آفاق مستقبلية</div>
+    <h1>ماذا لو طُبّق في بيئة إنتاجية؟</h1>
+    <div class="grid g3">
+      <div class="card"><b>باكت الحيوي</b><p>رفع عدد العوامل (بصمة الوجه/الجهاز، خطر الموقع الجغرافي الحقيقي).</p></div>
+      <div class="card"><b>تعلم آلي</b><p>نموذج رياضي يتعلم عادات الدخول لكل مستخدم بدل الثوابت.</p></div>
+      <div class="card"><b>استجابة تلقائية</b><p>عزل تلقائي، إنذار منصات المراقبة، ومشاركة التهديدات بين المنظمات.</p></div>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide">
+    <div class="kicker">شكرًا</div>
+    <h1>Cornell&nbsp;Deep</h1>
+    <p class="lead">منصة جاهزة للتجربة: شغّل <code>npm start</code> ثم زر موقع <code>localhost:4000</code>.<br>
+    دخّل المشرف لنرى SOC + البوابة + التحقيق، وشغّل الهجمات المحاكية وراقب الدفاع يتصدى لحظيًا.</p>
+    <div style="margin-top:26px"><span class="pill">smoke 17/17</span><span class="pill">e2e-all 77/77</span><span class="pill">ui-smoke 28/28</span><span class="pill">restart 18/18</span><span class="pill">فيديو demo.mp4</span></div>
+  </section>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  let i = 0;
+  function show(n){ i = (n + slides.length) % slides.length; slides.forEach((s,k)=>s.classList.toggle('on', k===i)); document.getElementById('pageno').textContent = (i+1)+' / '+slides.length; }
+  window.addEventListener('keydown', (e)=>{ if(e.key==='ArrowRight'||e.key===' ') show(i+1); if(e.key==='ArrowLeft') show(i-1); if(e.key==='Home') show(0); if(e.key==='End') show(slides.length-1); });
+  document.addEventListener('click', (e)=>{ if(e.target.closest('.tsw')) return; show(i+1); });
+  function setT(t){ document.documentElement.dataset.theme = t; try{ localStorage.setItem('cornell-theme', t); }catch(e){} document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); }
+  document.querySelectorAll('.tb').forEach(b=>b.addEventListener('click',(e)=>{ e.stopPropagation(); setT(b.dataset.t); }));
+  setT(document.documentElement.dataset.theme || 'light');
+  show(0);
+</script>
+</body>
+</html>

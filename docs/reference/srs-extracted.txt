@@ -1,0 +1,789 @@
+
+
+     
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Software Requirements Specification 
+Version 1.0 
+ 
+ 
+AuthShield 360 
+ 
+Project Name: AuthShield 360 
+Theme: VerifyVault -   Identity Beyond Passwords 
+Category: Ethical Cyber Horizons 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+Table of Contents 
+1.1 Background and Necessity of the Application .............................................................. 2 
+1.2 Proposed Solution .................................................................................................................. 3 
+1.3 Purpose of the Document.................................................................................................. 10 
+1.4 Scope of Project .................................................................................................................... 11 
+1.5 Constraints ............................................................................................................................ 12 
+1.6 Functional Requirements .................................................................................................. 13 
+1.7 Non-Functional Requirements ........................................................................................ 15 
+1.8 Interface Requirements ...................................................................................................... 18 
+1.8.1 Hardware ............................................................................................................... 18 
+1.8.2 Software ................................................................................................................. 18 
+1.9 Project Deliverables ............................................................................................................. 19 
+ 
+  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+1.1  Background and Necessity of the 
+Application 
+ 
+Schools increasingly use digital portals to manage student records, assignments, 
+examination  results,  attendance  information, and  administrative  functions.  
+These applications are accessed by students, teachers and administrators, and 
+the accounts may contain academic or personal information that should not be 
+exposed to unauthorized users. 
+ 
+A  portal  protected  only  by  a  username  and  password  can  become  vulnerable  
+when  passwords  are  weak,  reused,  shared,  guessed, or  disclosed  through  
+phishing.  If  an  attacker  obtains  a  valid  password,  the  portal  may  not  have  
+another  independent  method  to  confirm  that  the  person  signing  in  is  the  
+legitimate  account  owner.  Password-only  access  can  therefore  create  a  single  
+point of failure for important school information. 
+ 
+Multi-Factor Authentication (MFA) reduces this dependency by requiring more 
+than one type of proof before access is granted. A second factor must be a one-
+time code, an authenticator application, or an additional verification step such 
+as a time-limited email confirmation link. Each method offers a different balance 
+of  security,  usability,  cost,  recovery  effort, and  resistance  to  common  identity  
+attacks. 
+ 
+AuthShield  360 provides  a  safe  educational  environment  in  which  the  teams 
+can  use  a  preconfigured  fictional  school  portal  to  observe  the  limitations  of  
+password-only  login,  configure  and  test  MFA  methods,  and  compare  the  
+resulting  improvement  in  identity  protection.  The  project  focuses  on  secure  
+authentication,  role-based  access,  monitoring, and  authorized  security  testing  
+rather than developing authentication functions from scratch or attacking real 
+applications. 
+ 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+1.2  Proposed Solution 
+ 
+The proposed application, titled AuthShield 360, will provide a controlled and 
+simulation-based  environment  for  demonstrating  how  stronger  authentication  
+and access controls can protect a fictional school digital portal. Teams will use 
+a provided or preconfigured portal and configurable authentication platform to 
+assess password-only authentication, configure stronger security controls, and 
+perform authorized security tests. 
+ 
+Teams will  configure  and  test  MFA,  role-based  access  control,  failed-login 
+protection  and  authentication  monitoring  using  the  native  capabilities  of  the  
+selected  platform.  They  will  retest  the  secured  environment  and  compare  the  
+results before and after protection is applied. Teams are not required to develop 
+authentication logic, password-hashing functions, session-management code, or 
+a separate custom monitoring application. 
+ 
+ 
+The application will use three scenarios: 
+ 
+In the first scenario, the portal operates with password-only authentication. The 
+user  opens  the  portal,  enters  a  username  and  password,  and  the  application  
+verifies  the  credentials  against  the  stored  fictional  account  information.  If  the  
+password is incorrect, access is denied and the user may try again by re-entering 
+the  credentials.  If  the  credentials  are  correct,  access  is  granted  and  the  login  
+result is recorded. 
+ 
+After  successful  credential  verification,  teams should perform  an  authorized  
+security  assessment  of  the  locally  hosted  portal  using  Kali  Linux,  browser  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+developer tools, OWASP ZAP or Burp Suite, as applicable. The assessment may 
+examine  exposed  login  functions,  weak  test  credentials,  accessible  portal  
+resources,  authentication  behavior, and  role-based  access  exposure.  Teams 
+should use only fictional accounts and controlled test cases. The process should 
+conclude with a Login Successful outcome for valid credentials. 
+ 
+Scenario    1:    Password-Only    Authentication and Baseline    Security    
+Assessment 
+ 
+ 
+ 
+Flow: 
+ 
+• A student, teacher, or administrator opens the school portal. 
+• The user enters a username and password. 
+• The application verifies the submitted credentials. 
+• If the password is incorrect, access is denied. 
+• After  an  access-denied alert,  the  user  may  try  again  by  re-entering  the  
+username and password. 
+• If the password is correct, access is granted to the school portal. 
+• The application logs the successful authentication result using the built-
+in logging/monitoring interface. 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+• Teams then  perform  an  authorized  security  assessment  of  the  locally  
+hosted  portal  using  Kali  Linux,  browser  developer  tools,  OWASP  ZAP  or  
+Burp Suite, as applicable. 
+• The  assessment  may  examine  login  behavior,  weak  test  credentials,  
+accessible portal resources, and role-based access exposure. 
+• After successful verification and testing, the system records the outcome 
+as Login Successful. 
+• Teams will observe that a stolen, reused, or compromised password must 
+be sufficient to gain access in a password-only authentication system. 
+• Successful logins, failed login attempts, access-denied events, login time, 
+and relevant security observations are recorded. 
+• These  results  are  used  as  the  comparison  baseline  for  the  MFA-enabled 
+scenarios. 
+ 
+In  the  second  scenario,  the  portal  introduces  a  second  authentication  factor  
+after the password is verified. The user first enters a username and password. If 
+the  password  is  incorrect,  access  is  denied, and  the  user  may  try  again  by   
+re-entering the username and password. If the password is correct, the portal 
+requests a One-Time Password (OTP) as the second authentication factor. 
+ 
+The user enters the OTP and the application verifies whether it is valid. If the 
+OTP is invalid or expired, access is denied and the user may request a new OTP 
+and try again. If the OTP is valid, access is granted. The application then, records 
+the OTP authentication result and completes the process with a Login Successful 
+outcome. 
+ 
+After  OTP-based  MFA  is  configured,  teams should repeat  the  authorized  
+authentication  tests  performed  during  the  password-only  baseline  stage.  They  
+should verify that a valid password alone is not sufficient to complete the login 
+process  and  should  record  successful  OTP  verification,  invalid  OTP  attempts,  
+expired OTP attempts, access-denied events and successful login results. 
+ 
+The  recorded  results  should be  compared  with  the  password-only  baseline  to  
+evaluate the additional protection provided by the second authentication factor. 
+For  demonstration  purposes,  OTP  generation  or  delivery  should use  test  
+accounts,  local/mock  services, or  participant-owned  devices.  Real  student  
+contact details should not be required. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+Scenario 2: Password + OTP MFA and Security Retesting 
+ 
+ 
+ 
+Flow: 
+ 
+• A student, teacher, or administrator opens the school portal. 
+• The  user  enters  a  username  and  password  as  the  first  authentication  
+factor. 
+• The application verifies the submitted credentials. 
+• If the password is incorrect, access is denied. 
+• After an access-denied result, the user may try again by re-entering the 
+username and password. 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+• If the password is correct, the application requests an OTP as the second 
+authentication factor. 
+• The user enters the OTP received through the approved test channel. 
+• The application verifies whether the OTP is valid. 
+• If the OTP is invalid or expired, access is denied. 
+• After  an  invalid  or  expired  OTP,  the  user  may  request  a  new  OTP  and   
+re-enter it. 
+• If the OTP is valid, access is granted. 
+• The  application  logs  the  OTP  authentication  result  using  the  built-in 
+logging/monitoring interface. 
+• The login process is then completed with a Login Successful result. 
+• Teams record successful and failed OTP attempts, access-denied events, 
+login status, and authentication time. 
+• Teams compare these results with the password-only baseline to evaluate 
+the additional protection provided by OTP-based MFA. 
+ 
+In the third scenario, the portal will use additional multi-factor verification after 
+the username and password are verified. A mobile OTP will first be sent to the 
+registered test mobile number. After the user enters the correct mobile OTP and 
+the  verification  is  successful,  the  system  will  proceed  to  the  next  verification  
+layer. 
+ 
+The portal will then send a time-limited email OTP to the registered test email 
+address. Teams  will  configure  and  test  valid,  invalid, and  expired  email  OTP  
+attempts. Access will be granted only after the required authentication steps are 
+completed  successfully.  The  portal  will  then  apply  role-based  authorization  so  
+that  students,  teachers  and  administrators  can  access  only  their  permitted 
+functions.  Authentication  events,  factor  type,  success  or  failure, and  session  
+activity will be recorded for comparison. 
+ 
+If  the  password  is  incorrect,  access  should be  denied  and  the  user  should be 
+prompted to try again from the username and password step. If the mobile OTP 
+or  email  OTP  is  invalid  or  expires  before  verification,  access  should be  denied  
+and  the  user  should be  required  to  retry  or  restart  the  sign-in  process,  as  
+configured. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+Scenario 3: Password + OTP MFA + Email Step-Up Verification 
+ 
+ 
+  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+Flow: 
+• A student, teacher, or administrator begins sign-in to the school portal. 
+• The  user  enters  the  username  and  password  as  the  first  authentication  
+factor and the application verifies the credentials. 
+• If the password is incorrect, access is denied and the user is directed back 
+to the username and password step to try again. 
+• If the password is correct, the application requests a mobile OTP as the 
+second authentication factor. 
+• The user enters the mobile OTP and the application verifies it. 
+• If the mobile OTP is verified successfully, the application displays a Mobile 
+OTP Success status and proceeds to the next verification step. 
+• The application sends a time-limited email OTP to the user’s registered test 
+email address. 
+• The  user  retrieves  the  email  OTP  and  enters  it  in  the  application  for  
+verification. 
+• If   the   email   OTP   is   valid   and   entered   within   the   allowed   time,   
+authentication is completed successfully and access is granted. 
+• If  the  email  OTP  is  invalid  or  expired,  access  is  denied  and  the  user  is  
+prompted to try again or restart the authentication process. 
+• After   successful   authentication,   the   application   applies   role-based 
+permissions  so  that  students,  teachers,  and  administrators  can  access  
+only their permitted portal functions. 
+• The application logs the authentication result, including the factors used, 
+success or failure status and relevant audit events. 
+• Teams compare this scenario with password-only and password + mobile 
+OTP   authentication   to   understand   how   an   additional   email   OTP   
+verification layer strengthens the authentication process. 
+Comparison of Authentication Modes 
+The final application will compare following protection modes: 
+• Password-Only Authentication 
+• Password + OTP MFA 
+• Password + OTP MFA + Email OTP Verification 
+The comparison will help teams to observe how each additional authentication 
+control  changes  the  difficulty  of  unauthorized  access  and  the  experience  of  
+legitimate users. It will also allow them to compare factors such as average login 
+time, successful and failed sign-ins, second-factor failures, number of account-
+recovery steps, and qualitative observations of user convenience. Table 1 shows 
+the comparison of authentication modes.  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+Authentication 
+Mode 
+Security Strength Usability 
+Example Risk 
+Reduced 
+Password-Only 
+Authentication 
+Low to Medium Very easy 
+Adds no protection 
+if password is 
+stolen 
+Password + OTP Medium to High Easy to moderate 
+Stolen password 
+alone is 
+insufficient 
+Password + OTP 
+MFA + Email OTP 
+Verification 
+Higher 
+Moderate; depends 
+on email access 
+Provides an 
+additional 
+verification barrier 
+if the registered 
+email account 
+remains secure 
+and 
+uncompromised 
+Table 1: Comparison of Authentication Modes 
+This   integrated   application provides   a   practical,   hands-on   approach   to   
+understanding why modern identity security moves beyond passwords and how 
+MFA methods differ in both protection and usability. 
+ 
+1.3  Purpose of the Document 
+ 
+The  purpose  of  this  document  is  to  provide  a  complete  description  of  the  
+AuthShield  360 application,  including  its  objectives,  boundaries,  functional  
+behavior, quality requirements, interfaces, and expected deliverables. It defines 
+how teams will perform authorized reconnaissance and authentication-security 
+assessment,  identify  exposure,  configure  MFA  and  role-based  access  controls,  
+perform controlled ethical-hacking tests, retest the secured application, monitor 
+authentication  events  and  compare  security  and  usability  results  within  an  
+isolated project environment. 
+The   document   is   intended   for   teams,   project   mentors,   evaluators,   and 
+cybersecurity educators. It provides a common reference for configuring, testing, 
+and demonstrating the application using fictional accounts and sample data.  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+ 
+1.4  Scope of Project 
+ 
+AuthShield  360 is  an  educational  identity-security  project  that  demonstrates  
+the role of MFA in protecting a fictional school digital portal. The application will 
+create test accounts for Student, Teacher, and Administrator roles and provide 
+sample modules such as student records, assignments, examination results, and 
+administrative functions. 
+The  project  scope  includes  baseline  authentication-security  assessment,  user  
+and   role   configuration,   password-only   authentication   testing,   OTP   MFA   
+configuration,  role-based  authorization,  failed-login  protection,  authentication  
+logging   and   monitoring,   controlled   security   testing, and   post-hardening 
+retesting.   Where   supported   by   the   selected   platform,   teams may   also   
+demonstrate email step-up verification and account-recovery functions. 
+Teams will demonstrate how access changes when MFA is enabled and how a 
+second  factor  prevents  selected  unauthorized  sign-in  attempts.  They  will  also  
+examine  how  an  additional  step-up  verification  layer  affects  the  security  and  
+usability of OTP-based MFA and the experience of legitimate users. 
+The  project  does  not  include  the  use  of  real  school  credentials,  real  student  
+records,  or  unauthorized  login  attempts  against  public  services.  All  users,  
+records, email addresses, phone numbers, passwords and test events must be 
+fictional or owned by the participants and used only for the project. 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+ 
+1.5  Constraints 
+ 
+The AuthShield  360 project  must  operate  only  with  fictional  or  participant-
+owned accounts in an authorized lab or development environment. Public school 
+portals,  real  student  accounts, and  third-party  services  must  not  be  tested  
+without explicit permission. 
+ 
+The accuracy of the comparison depends on correct MFA configuration, secure 
+secret handling, consistent test cases and reliable device/browser support. OTP 
+or   authenticator   behavior   may   vary   depending   on   device   time,   network   
+availability and the selected authentication platform, authenticator application 
+or  service. Email-based  verification  depends  on  reliable  email/SMTP  delivery,  
+and test-mailbox access must be arranged for each demonstration account. 
+ 
+Passwords, MFA secrets, email credentials, recovery codes, session secrets, and 
+API keys must never be committed to GitHub or any public project repository. 
+  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+1.6  Functional Requirements 
+ 
+Following are the functional requirements of the application: 
+ 
+i. Fictional  School  Portal  – The  project  should use  a  provided  or  
+preconfigured  Web-based  school  portal  containing  fictional  student  
+records, assignments, examination results, and administrative functions. 
+All records should use dummy data. 
+ 
+ii. User and Role Management – The environment should support Student, 
+Teacher  and  Administrator  test  accounts.  Teams should configure  or  
+verify that each role can access only its assigned functions. 
+ 
+iii. Baseline   Password-Only Authentication – Teams   should test   a   
+password-only  authentication  mode  and  record  successful  and  failed  
+sign-ins, access results, and basic login time for baseline comparison. 
+ 
+iv. Secure  Password  Handling  – The  selected  authentication  platform  
+should securely  store  passwords  using  an  approved  password-hashing 
+mechanism and should not display or log passwords in plain text. Teams 
+are not required to implement password-hashing logic. 
+ 
+v. MFA  Configuration – Teams should configure  an  approved  OTP-based 
+second factor using the native capabilities of the selected authentication 
+platform or authenticator solution. 
+ 
+vi. MFA Testing –  Teams should test successful MFA authentication, invalid 
+OTP   entry,   OTP   submitted   outside   its   valid   time   window, and 
+authentication without the required second factor. 
+ 
+vii. Role-Based  Access  Control – Teams should configure  or  validate  role-
+based  access  control  so  that  Student,  Teacher, and  Administrator  
+accounts can access only their permitted resources. 
+ 
+viii. Failed Login Protection – Teams should configure the native failed-login 
+protection   provided   by   the   selected   authentication   platform.   A   
+measurable threshold, such as five failed attempts within a configurable 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+period, should trigger a response such as temporary lockout, rate limiting, 
+login delay, or security alert. 
+ 
+ix. Session Security Validation – Teams should validate available session-
+security controls such as logout, session timeout, and invalidation of an 
+authenticated session. Development of custom session-management logic 
+is not required. 
+ 
+x. Authentication Logging and Monitoring – Teams should use the native 
+logging   or   monitoring   capabilities   of   the   selected   application   or   
+authentication  platform  to  review  successful  and  failed  sign-ins,  MFA  
+failures,  lockout  events, and  role-access  violations.  A  separate  custom  
+monitoring application or dashboard is not required. 
+ 
+xi. Controlled  Ethical  Hacking  and  Security  Testing  – Teams should 
+perform   authorized   authentication   and   access-control   testing   only   
+against the AuthShield 360 project environment. Browser developer tools, 
+OWASP ZAP or Burp Suite must be used for authentication-flow testing, 
+role/access-control validation, session, or cookie inspection and evidence 
+collection. 
+ 
+xii. Identity  Security  Test  Matrix  – Teams should maintain  a  mandatory  
+Identity Security Test Matrix containing Test ID, User/Role, Test Action, 
+Expected Result, Actual Result, Pass/Fail Status, and Evidence. 
+• Valid password-only login 
+• Compromised test password in password-only mode 
+• Correct password without required MFA 
+• Valid OTP 
+• Invalid OTP 
+• OTP submitted outside its valid time window 
+• Repeated failed login attempts 
+• Student attempting Teacher/Administrator resource access 
+• Teacher attempting Administrator-only resource access 
+• Logout followed by an attempt to reuse the previous session 
+• Email step-up verification and account-recovery test cases should 
+be included only when those features are supported and configured 
+in the selected platform 
+ 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+xiii. Configuration   Reset   – The   project   environment   should   support   
+repeatable  demonstrations  using  native  reset  functionality,  a  prepared  
+configuration, virtual-machine snapshot, or equivalent reset method. 
+ 
+In  addition  to  the  mandatory  requirements,  teams may  demonstrate  following  
+features where supported by the selected platform: 
+• Email step-up verification 
+• Account recovery or MFA reset 
+• Risk-based or step-up authentication for selected administrator functions 
+• Notification when an MFA method is added, removed, or reset 
+• Recovery-code guidance 
+• Authentication-log filtering by user role, date, factor type or result 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+1.7  Non-Functional Requirements 
+ 
+Following   non-functional   requirements   define   the   expected   quality   and   
+operational characteristics of the AuthShield 360 application: 
+ 
+Portability: The  project  should  be  deployable  on  common  desktop  or  laptop  
+hardware using a modern Web browser.  
+ 
+Performance: The  portal  should process  normal  authentication  requests  
+without  unnecessary  delay.  New  authentication  events  should  appear  in  the  
+monitoring  interface  within  five  seconds  under  normal  laboratory  conditions.  
+Teams should record login time for each authentication scenario and calculate 
+average results from at least three test runs. 
+ 
+Scalability: The  selected  platform  should  support  additional  test  users,  roles, 
+and authentication methods where required. 
+ 
+Reliability: Authentication  settings,  user  roles,  MFA  enrollment  information, 
+and audit records should remain consistent during normal operation.  
+Disclaimer: All  reconnaissance (exploration or  investigation),  authentication  
+testing, authorized  authentication  and  access-control  security  testing,  login  
+testing, and other simulated security activities must be performed only against 
+the authorized AuthShield 360 project environment and fictional or participant-
+owned  test  accounts.  Public  Websites,  real  school  portals,  production  systems  
+and third-party accounts must never be targeted. 
+ 
+ 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+Teams  should perform  a  controlled  restart  test  and  verify  that  user  accounts,  
+roles,  MFA  settings, and  required  audit  information  remain  available  after  
+restart. 
+ 
+Usability: Login,  MFA  enrollment  and  administration  screens,  and  recovery  
+screens  where  implemented,  should use  clear  labels  and  logical  navigation.  
+Users should understand what factor is required and what action to take when 
+authentication fails. 
+ 
+Maintainability: Configuration   settings,   role   definitions,   authentication   
+settings, and  required  project  files  should  be  organized  and  documented  to  
+support repeatable testing and troubleshooting. 
+ 
+ 
+Security: MFA  secrets,  password  hashes,  email  credentials,  recovery  codes,  
+administrator  credentials, and  application  secrets  should be  securely  stored.  
+Secrets should never be included in source-code repositories or public files. 
+ 
+Auditability:   Security-relevant   events   should record,   where   applicable,   
+timestamp,    user/account,    role,    authentication    factor,    action,    source    
+information, session information, and outcome so that test activity can be traced 
+during evaluation. 
+ 
+Compatibility: The  core  password  and  OTP  functions  should  operate  on  
+commonly used modern browsers.  
+ 
+Accessibility: Authentication  screens  should  use  readable  text,  clear  status  
+messages, and  keyboard-friendly  controls  where  possible.  Instructions  should  
+not only rely on color to indicate success or failure. 
+ 
+Testability:   The   application   should allow   repeatable   test   accounts   and   
+resettable  sample  data  so  that  evaluators  can  reproduce  the  authentication  
+scenarios and verify the expected results. 
+ 
+These requirements     represent     the     minimum     mandatory     
+expectations  for  the  project.   All  functional  and  non-functional 
+requirements specified in this SRS must be implemented. 
+ 
+Once  they  are  complete,  you  can  use  your  own  creativity  and  
+imagination to add more features if required. 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ 
+Do NOT copy project content or configuration from GPTs or other 
+AI tools, although you are permitted to use images generated by AI 
+tools  for  any  visual  representation  purposes.  It  is  mandatory  to  
+mention such tools used in case you add any AI-generated images 
+or diagrams for various activities. 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+1.8  Interface Requirements 
+ 
+1.8.1 Hardware  
+ 
+Following are the Hardware Components required: 
+• Intel Core i5/i7 Processor or higher 
+• 16 GB RAM or higher 
+• 500 GB or more available disk space  
+• Keyboard and Mouse 
+• Internet/LAN connectivity, where required, must be used only for 
+approved dependency installation or test-email delivery. It must not be 
+used as a target for reconnaissance or security testing 
+• Participant-owned smartphone or authenticator-capable device, if 
+required by the selected MFA method 
+• Desktop/Laptop and additional hardware as required 
+1.8.2 Software 
+ 
+Operating Systems: Windows or Linux 
+Virtualization: VMware Workstation/Player or VirtualBox 
+ 
+Authentication and Security Environment: 
+• Provided/preconfigured AuthShield 360 school portal 
+• Configurable authentication/identity platform 
+Security Testing Tools: 
+• Kali Linux 
+• OWASP ZAP or Burp Suite 
+• Wireshark and Nmap, where required 
+• Browser Developer Tools 
+Supporting Tools: 
+• Modern browser such as Chrome, Edge, or Firefox 
+• Approved mock/test email service such as Mailtrap, where email step-up 
+verification is used 
+• Postman, where API testing is applicable  
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+1.9  Project Deliverables 
+ 
+The final project submission should include following deliverables: 
+ 
+A project report comprising: 
+ 
+• Problem definition 
+• Application architecture and authentication flow 
+• Selected tools/platforms and configuration 
+• User and Role Access Matrix 
+• Password-only baseline results 
+• MFA configuration and test results 
+• Role-based access-control results 
+• Failed-login protection results 
+• Authentication logs and monitoring evidence 
+• Identity Security Test Matrix 
+• Security and usability comparison 
+• Conclusions and recommendations 
+• Application/configuration files, where applicable 
+• Security Test Evidence: Teams should provide screenshots, logs, and other 
+relevant  evidence  supporting  the  Identity  Security  Test  Matrix  and  the  
+authorized  authentication  and  access-control  security  tests  performed.  
+The  evidence  should  include  successful  and  failed  login  attempts,  valid, 
+and invalid OTP tests, OTP submitted outside its valid time window, failed-
+login protection, unauthorized role/resource access, and logout/session-
+security  validation.  Evidence  for  email  step-up  verification  or  account  
+recovery   should be   included   where   these   optional   features   are   
+implemented. 
+ 
+Presentation: The  presentation  should summarize  the  project  environment,  
+selected  tools/platforms,  authentication  and  security  configuration,  testing  
+performed, observations, comparison results, and conclusions. 
+ 
+Demonstration  Video  (.mp4):  Teams  should submit  a  mandatory  video  
+demonstrating the working AuthShield 360 project environment and the major 
+authentication  and  security  tests  performed.  The  video  should  demonstrate 
+password-only authentication, successful and failed login attempts, OTP-based 
+MFA, invalid OTP and OTP submitted outside its valid time window. It should 
+also  demonstrate  failed-login  protection,  role-based  access-control  testing,  
+authentication   logging/monitoring   and   logout/session-security   validation.   
+Where  email  step-up  verification,  account  recovery, or  other  optional  features  
+are implemented, these may also be demonstrated in the video. The video should 
+
+ 
+ 
+ 
+ 
+© Aptech Limited 
+ 
+ 
+ 
+clearly show the difference between the baseline password-only scenario and the 
+secured MFA-based scenario. 
+ 
+The consolidated project should be submitted as a ZIP file with a README.md 
+file. The   README.md   file should   contain the   prerequisites,   application   
+architecture,   authentication   flow,   selected   tools/platforms,   configuration   
+information, installation/setup steps, execution instructions, assumptions, and 
+test credentials where appropriate, and troubleshooting notes.  
+ 
+Documentation  is  an  important  part  of  the  project;  therefore,  all  important  
+configuration,  testing, and  demonstration  information  should be  documented  
+clearly. 
+ 
+~~~ End of Document ~~~ 
