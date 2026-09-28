@@ -1,0 +1,36 @@
+=== UI smoke (real browser) ===
+command : node scripts\ui-smoke.js 
+started : 2026-09-28T18:42:28.114Z
+duration: 14.9s
+exit    : 0
+--- output ---
+  PASS ingest visible
+  PASS app hidden initially
+  PASS theme toggle switches + persists theme
+  PASS admin logged in → app shell
+  PASS default tab = SOC
+  PASS 5 tabs rendered
+  PASS role shown
+  PASS blacklist panel switches
+  PASS blacklist add row
+  PASS audit filtered rows present
+  PASS portal visible
+  PASS portal overview cards
+  PASS module nav has users+matrix (admin)
+  PASS courses table loads
+  PASS matrix table loads
+  PASS forensics visible
+  PASS summary cards
+  PASS timeline rows for admin
+  PASS drawer opens with evidence
+  PASS drawer evidence rows
+  PASS case row in table
+  PASS drawer closes
+  PASS benchmark visible
+  PASS benchmark rows x3
+  PASS security center visible
+  PASS recovery panel present
+  PASS my devices table
+  PASS logged out → ingest
+
+UI SMOKE: ALL CHECKS PASSED

@@ -1,0 +1,59 @@
+{
+  "startedAt": "2026-09-28T18:41:47.367Z",
+  "base": "http://localhost:4000",
+  "node": "v24.19.0",
+  "suites": [
+    {
+      "name": "01-smoke",
+      "label": "Smoke (no server)",
+      "file": "docs/technical/Test_Run_Logs/01-smoke.log",
+      "command": "node scripts\\smoke.js ",
+      "exitCode": 0,
+      "durationSec": 6,
+      "checks": 17,
+      "failures": 0,
+      "reportedPassed": 17,
+      "reportedFailed": 0
+    },
+    {
+      "name": "02-e2e",
+      "label": "End-to-end (live server)",
+      "file": "docs/technical/Test_Run_Logs/02-e2e.log",
+      "command": "node scripts\\e2e-all.js ",
+      "exitCode": 0,
+      "durationSec": 33.7,
+      "checks": 77,
+      "failures": 0,
+      "reportedPassed": 77,
+      "reportedFailed": 0
+    },
+    {
+      "name": "03-ui",
+      "label": "UI smoke (real browser)",
+      "file": "docs/technical/Test_Run_Logs/03-ui.log",
+      "command": "node scripts\\ui-smoke.js ",
+      "exitCode": 0,
+      "durationSec": 14.9,
+      "checks": 28,
+      "failures": 0,
+      "reportedPassed": 28,
+      "reportedFailed": 0
+    },
+    {
+      "name": "04-restart",
+      "label": "Restart durability (NFR)",
+      "file": "docs/technical/Test_Run_Logs/04-restart.log",
+      "command": "node scripts\\restart-check.js ",
+      "exitCode": 0,
+      "durationSec": 11.1,
+      "checks": 18,
+      "failures": 0,
+      "reportedPassed": 18,
+      "reportedFailed": 0
+    }
+  ],
+  "finishedAt": "2026-09-28T18:42:55.293Z",
+  "totalChecks": 140,
+  "totalFailures": 0,
+  "verdict": "ALL GREEN"
+}

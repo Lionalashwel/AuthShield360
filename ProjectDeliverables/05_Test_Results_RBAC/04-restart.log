@@ -1,0 +1,25 @@
+=== Restart durability (NFR) ===
+command : node scripts\restart-check.js 
+started : 2026-09-28T18:42:42.969Z
+duration: 11.1s
+exit    : 0
+--- output ---
+restart-check → pass 18 / fail 0
+  ✓ boot #1 healthy
+  ✓ seed: 5 accounts on fresh DB
+  ✓ admin S3 login (pre-restart)
+  ✓ registration ok
+  ✓ verify → trust cookie
+  ✓ S2 login persists session/audit/success
+  ✓ forensic case opened with captured evidence
+  ✓ pre-restart state: audit=6 sessions=2
+  ✓ boot #2 after restart
+  ✓ users survived restart (5 demo + registered)
+  ✓ audit trail persisted across restart
+  ✓ successful-login events survived
+  ✓ TOTP secrets persisted (user can still log in)
+  ✓ sessions + devices survived restart
+  ✓ forensic case + evidence survived restart
+  ✓ case markdown export after restart
+  ✓ attack runs survived restart
+  ✓ benchmark (real elapsed_ms) works after restart

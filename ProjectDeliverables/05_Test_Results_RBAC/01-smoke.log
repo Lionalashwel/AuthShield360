@@ -1,0 +1,25 @@
+=== Smoke (no server) ===
+command : node scripts\smoke.js 
+started : 2026-09-28T18:41:48.440Z
+duration: 6.0s
+exit    : 0
+--- output ---
+  ok   risk: new device alone = 30 (LOW)
+  ok   risk: new device + time anomaly = 45 (MEDIUM)
+  ok   risk: blacklisted IP + new device = 75 (HIGH)
+  ok   risk: returns reasons[]
+  ok   risk: baseline LOW
+  ok   risk: clamp 0..100
+  ok   S1 warm direct -> SUCCESS (LOW)
+  ok   S1 wrong pw -> FAILED_PASSWORD
+  ok   S2 requests OTP (scenario mandate)
+  ok   S2 valid OTP -> SUCCESS
+  ok   S2 invalid OTP -> INVALID_OTP
+  ok   S3 OTP+Email+RBAC -> SUCCESS
+  ok   >=2 failures -> HIGH_RISK_BLOCK
+  ok   register -> verification_pending (+ real mail attempt)
+  ok   verification link issued
+  ok   verify -> trusted device + cookie
+  ok   new registered user (trusted fp) direct SUCCESS
+
+  17 passed, 0 failed
